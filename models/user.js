@@ -5,6 +5,12 @@ userSchema = new Schema({
     password: String,
     email: String,
     createdAt: String,
+    assignments: [
+        {
+            title: String,
+            dueDate: String
+        }
+    ],
   });
 
 module.exports = model('User', userSchema);
