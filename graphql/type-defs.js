@@ -33,7 +33,7 @@ const typeDefs = gql`
     type Mutation{
         registerUser(registerInput: RegisterInput): User!
         loginUser(username: String!, password: String!): User!
-        addAssignment(username: String!, title: String!, dueDate: String!): User!   #dueDate formatted as xx/xx/xxxx
+        addAssignment(title: String!, dueDate: String!): User!   #dueDate formatted as xx/xx/xxxx
     }
 `;
 

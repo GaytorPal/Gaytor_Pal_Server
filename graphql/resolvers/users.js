@@ -3,6 +3,7 @@ const User = require('../../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { UserInputError } = require('apollo-server');
+const checkAuth = require('../../util/check-auth');
 
 const { SECRET_KEY } = require('../../config');
 
@@ -74,7 +75,6 @@ module.exports = {
               email,
               username,
               password,
-              points: 0,
               createdAt: new Date().toISOString()
             });
       
@@ -112,8 +112,11 @@ module.exports = {
                 token
               };
         },
-        async addAssignment(_, {username, title, dueDate}) {
-          var user = await User.findOne({username});
+        async addAssignment(parent, {title, dueDate}, context) {
+
+          var user = await User.findOne({username: checkAuth(context).username})
+
+          console.log(user.username)
 
           //input validation
           if (title.trim() === '') {
