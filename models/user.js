@@ -8,6 +8,7 @@ userSchema = new Schema({
     assignments: [
         {
             title: String,
+            description: String,
             dueDate: String
         }
     ],

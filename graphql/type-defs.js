@@ -14,6 +14,7 @@ const typeDefs = gql`
     type Assignment {
         id: ID!
         title: String!
+        description: String!
         dueDate: String!
     }
 
@@ -33,7 +34,7 @@ const typeDefs = gql`
     type Mutation{
         registerUser(registerInput: RegisterInput): User!
         loginUser(username: String!, password: String!): User!
-        addAssignment(title: String!, dueDate: String!): User!   #dueDate formatted as xx/xx/xxxx
+        addAssignment(title: String!, description: String! dueDate: String!): User!   #dueDate formatted as xx/xx/xxxx
     }
 `;
 
