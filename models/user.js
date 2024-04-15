@@ -9,7 +9,8 @@ userSchema = new Schema({
         {
             title: String,
             description: String,
-            dueDate: String
+            dueDate: String,
+            category: String
         }
     ],
   });

@@ -112,7 +112,7 @@ module.exports = {
                 token
               };
         },
-        async addAssignment(_, {title, description, dueDate}, context) {
+        async addAssignment(_, {title, description, dueDate, category}, context) {
 
           var user = await User.findOne({username: checkAuth(context).username})
 
@@ -174,7 +174,8 @@ module.exports = {
             user.assignments.unshift({
               title,
               description,
-              dueDate
+              dueDate,
+              category
             });
             await user.save();
             return user;
