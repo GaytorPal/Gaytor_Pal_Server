@@ -243,6 +243,7 @@ module.exports = {
           //                                                 ])
 
           const user = await User.findById(user_id);
+          console.log(user)
 
           if (user) {
             const assignment_index = user.assignments.findIndex((c) => c.id === target_id);
@@ -266,6 +267,34 @@ module.exports = {
           catch (err) {
              console.log("repinga")
              throw new Error(err);
+          }
+        },
+
+        async deleteAssignment(_, {target_id, user_id}) {
+          try {
+            
+            const user = await User.findById(user_id);
+            console.log(user)
+
+            if (user) {
+              const assignment_index = user.assignments.findIndex((c) => c.id === target_id);
+
+              if (assignment_index == -1) {throw new UserInputError("Assignment not found")}
+
+              console.log(assignment_index)
+      
+              user.assignments.splice(assignment_index, 1)
+
+              await user.save();
+              return "Assignment Deleted Successfully";
+
+            } else {
+              throw new UserInputError('User not found');
+            }
+          }
+            catch (err) {
+              console.log("repinga")
+              throw new Error(err);
           }
         }
      }

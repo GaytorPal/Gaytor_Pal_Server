@@ -58,6 +58,7 @@ const typeDefs = gql`
         registerUser(registerInput: RegisterInput): User!
         loginUser(username: String!, password: String!): User!
         addAssignment(username: String!, title: String!, description: String!, dueDate: String!, category: String!): User!   #dueDate formatted as mm/dd/yyyy hh:mm
+        deleteAssignment(target_id: ID!, user_id: ID!): String!
         toggleCompleted(target_id: ID!, user_id: ID!): User!
 
         registerClub(registerInput: RegisterInput): Club!
