@@ -9,6 +9,7 @@ const typeDefs = gql`
         createdAt: String!
         token: String!
         assignments: [Assignment]
+        followingClubs: [Club]
     }
 
     type Assignment {
@@ -26,15 +27,15 @@ const typeDefs = gql`
         date: String!
     }
 
-        # (1) make the Club a separate entity or (2) make it a user with extra privileges?
-        type Club{
-            id: ID!
-            username: String!
-            email: String!
-            password: String!
-            token: String!
-            events: [Event]
-        }
+    type Club{
+        id: ID!
+        username: String!
+        email: String!
+        password: String!
+        token: String!
+        events: [Event]
+        followers: [User]
+    }
 
     input RegisterInput {
         username: String!
@@ -48,6 +49,7 @@ const typeDefs = gql`
         getAssignmentsByDue(target_username: String!, target_dueDate: String!): [Assignment]!
         getClubs: [Club!]!
         getEventsByDue(target_username: String!, target_dueDate: String!): [Event]!
+        getClubsFollowedByUser: [Club!]!
     }
 
     type Mutation{
@@ -57,6 +59,9 @@ const typeDefs = gql`
         registerClub(registerInput: RegisterInput): Club!
         loginClub(username: String!, password: String!): Club!
         addEvent(title: String!, description: String!, dueDate: String!, category: String!): Club!
+        # follow/unfollow
+        followClub(username: String!): User!
+        unfollowClub(username: String!): User!
     }
 `;
 

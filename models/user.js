@@ -13,6 +13,7 @@ userSchema = new Schema({
             category: String
         }
     ],
+    followingClubs: [{ type: Schema.Types.ObjectId, ref: 'Club' }]
   });
 
 module.exports = model('User', userSchema);
