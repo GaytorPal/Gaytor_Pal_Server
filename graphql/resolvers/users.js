@@ -40,7 +40,7 @@ module.exports = {
                                                           {"$match": {"assignments.dueDateReduced": target_dueDate, "username": target_username}},
                                                           {"$project":
                                                             {"id": "$assignments._id", "title": "$assignments.title", "description": "$assignments.description",
-                                                             "dueDate": "$assignments.dueDate", "category": "$assignments.category"}}
+                                                             "dueDate": "$assignments.dueDate", "dueDateReduced": "$assignments.dueDateReduced", "category": "$assignments.category"}}
                                                          ])
 
             console.log(due_assignments)
