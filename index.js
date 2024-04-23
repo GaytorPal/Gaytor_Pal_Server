@@ -3,7 +3,6 @@ const {typeDefs} = require("./graphql/type-defs");
 const resolvers = require("./graphql/resolvers");
 
 const mongoose = require('mongoose');
-//const uri = "mongodb+srv://jdramirez237:sweenie8@sweenieproject.2cfnznc.mongodb.net/?retryWrites=true&w=majority"
 const { MONGODB } = require('./config.js');
 
 startApolloServer = async () => {
