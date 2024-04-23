@@ -15,6 +15,7 @@ clubSchema = new Schema({
             dateReduced: String
         }
     ],
+    followers: [{ type: Schema.Types.ObjectId, ref: 'User' }]
   });
 
 module.exports = model('Club', clubSchema);
