@@ -17,7 +17,9 @@ const typeDefs = gql`
         title: String!
         description: String!
         dueDate: String!
+        dueDateReduced: String!
         category: String!
+        completed: Boolean!
     }
 
     type Event {
@@ -25,6 +27,7 @@ const typeDefs = gql`
         title: String!
         description: String!
         date: String!
+        dateReduced: String!
     }
 
     type Club{
@@ -47,6 +50,7 @@ const typeDefs = gql`
     type Query{
         getUsers: [User!]!
         getAssignmentsByDue(target_username: String!, target_dueDate: String!): [Assignment]!
+        
         getClubs: [Club!]!
         getEventsByDue(target_username: String!, target_dueDate: String!): [Event]!
         getClubsFollowedByUser: [Club!]!
@@ -55,10 +59,13 @@ const typeDefs = gql`
     type Mutation{
         registerUser(registerInput: RegisterInput): User!
         loginUser(username: String!, password: String!): User!
-        addAssignment(title: String!, description: String!, dueDate: String!, category: String!): User!   #dueDate formatted as xx/xx/xxxx
+        addAssignment(username: String!, title: String!, description: String!, dueDate: String!, category: String!): User!   #dueDate formatted as mm/dd/yyyy hh:mm
+        deleteAssignment(target_id: ID!, user_id: ID!): String!
+        toggleCompleted(target_id: ID!, user_id: ID!): User!
+
         registerClub(registerInput: RegisterInput): Club!
         loginClub(username: String!, password: String!): Club!
-        addEvent(title: String!, description: String!, dueDate: String!, category: String!): Club!
+        addEvent(username: String!, title: String!, description: String!, dueDate: String!, category: String!): Club!
         # follow/unfollow
         followClub(username: String!): User!
         unfollowClub(username: String!): User!

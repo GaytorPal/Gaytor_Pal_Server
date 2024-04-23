@@ -10,7 +10,9 @@ userSchema = new Schema({
             title: String,
             description: String,
             dueDate: String,
-            category: String
+            dueDateReduced: String,
+            category: String,
+            completed: Boolean
         }
     ],
     followingClubs: [{ type: Schema.Types.ObjectId, ref: 'Club' }]

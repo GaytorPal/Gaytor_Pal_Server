@@ -5,6 +5,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { UserInputError } = require('apollo-server');
 const checkAuth = require('../../util/check-auth');
+const mongoose = require('mongoose');
+const {ObjectId} = require('mongodb')
 
 const { SECRET_KEY } = require('../../config');
 
@@ -32,26 +34,27 @@ module.exports = {
           }
         },
         async getAssignmentsByDue(_, {target_username, target_dueDate}) {
-          // const user = await User.findOne({username})
-
-          console.log(target_username)
-          console.log(target_dueDate)
 
           try {
-            // const due_assignments = await User.find({ "assignments.dueDate": target_dueDate, username: target_username });
+            
             const due_assignments = await User.aggregate(
                                                          [
                                                           {"$unwind": {"path": "$assignments"}},
-                                                          {"$match": {"assignments.dueDate": target_dueDate, "username": target_username}},
+                                                          {"$match": {"assignments.dueDateReduced": target_dueDate, "username": target_username}},
                                                           {"$project":
-                                                            {"title": "$assignments.title", "dueDate": "$assignments.dueDate"}}
+                                                            {"id": "$assignments._id", "title": "$assignments.title", "description": "$assignments.description",
+                                                             "dueDate": "$assignments.dueDate", "dueDateReduced": "$assignments.dueDateReduced",
+                                                              "category": "$assignments.category", "completed": "$assignments.completed"}}
                                                          ])
 
             console.log(due_assignments)
 
+            // console.log(due_assignments[4].dueDate)
+
             return due_assignments;
           } catch (err) {
-            throw new Error(err);
+             console.log("repinga")
+             throw new Error(err);
           }
         },
         getClubsFollowedByUser: async (_, {}, context) => {
@@ -127,11 +130,14 @@ module.exports = {
                 token
               };
         },
-        async addAssignment(_, {title, description, dueDate, category}, context) {
+        async addAssignment(_, {username, title, description, dueDate, category}) {
 
-          var user = await User.findOne({username: checkAuth(context).username})
+          console.log(username)
 
-          console.log(user.username)
+          // var user = await User.findOne({username: checkAuth(context).username})
+          var user = await User.findOne({username})
+          
+          if (!user) {throw new UserInputError('User not found')}
 
           //input validation
           if (title.trim() === '') {
@@ -185,18 +191,127 @@ module.exports = {
             }
           }
 
+          console.log(dueDate)
+          dueDate = dueDate.replaceAll(/-|_/gi,"/")
+          console.log(dueDate)
+
+          const dueDateReduced = dueDate.substring(0, 10)
+          console.log(":" + dueDateReduced)
+
+          const completed = false
+
           if (user) {   //user found
             user.assignments.unshift({
               title,
               description,
               dueDate,
-              category
+              dueDateReduced,
+              category,
+              completed
             });
             await user.save();
             return user;
           } else throw new UserInputError('User not found')
         },
         
+        async toggleCompleted(_, {target_id, user_id}) {
+          try {
+
+            //let the_id = ObjectId(target_id)
+
+            // console.log(target_id)
+
+            // const user = await User.findById(target_id).aggregate(
+            //                                                 [
+            //                                                 {"$unwind": {"path": "$assignments"}},
+                                                          
+                                                            
+            //                                                 ]
+
+            // )
+            // console.log(user)
+
+            // const the_assignment = User.find({
+            //   "assignments": {
+            //     "$elemMatch": {
+            //       "_id": mongoose.Types.ObjectId(the_id),
+            //       "default": true
+            //     }
+            //   }
+            // }, {
+            //   "accounts.$._id": 1 // "accounts.$": 1 also works
+            // }).pretty()
+
+          //   idConversionStage = {
+          //     $addFields: {
+          //        convertedId: { $toObjectId: "$_id" }
+          //     }
+          //  };
+            
+          //   const the_assignment = await User.aggregate(
+          //                                                 [
+          //                                                 {"$unwind": {"path": "$assignments"}},
+          //                                                 idConversionStage,
+          //                                                 {"$match": {"assignments.convertedId": target_id}},
+          //                                                 {"$project":
+          //                                                   {"id": "$assignments.id"}}
+          //                                                 ])
+
+          const user = await User.findById(user_id);
+          console.log(user)
+
+          if (user) {
+            const assignment_index = user.assignments.findIndex((c) => c.id === target_id);
+
+            if (assignment_index == -1) {throw new UserInputError("Assignment not found")}
+
+            console.log(assignment_index)
+    
+            if (user.assignments[assignment_index].completed) 
+            {
+              user.assignments[assignment_index].completed = false
+            } else {
+              user.assignments[assignment_index].completed = true
+            }
+              await user.save();
+              return user;
+          } else {
+            throw new UserInputError('User not found');
+          }
+        }
+          catch (err) {
+             console.log("repinga")
+             throw new Error(err);
+          }
+        },
+
+        async deleteAssignment(_, {target_id, user_id}) {
+          try {
+            
+            const user = await User.findById(user_id);
+            console.log(user)
+
+            if (user) {
+              const assignment_index = user.assignments.findIndex((c) => c.id === target_id);
+
+              if (assignment_index == -1) {throw new UserInputError("Assignment not found")}
+
+              console.log(assignment_index)
+      
+              user.assignments.splice(assignment_index, 1)
+
+              await user.save();
+              return "Assignment Deleted Successfully";
+
+            } else {
+              throw new UserInputError('User not found');
+            }
+          }
+            catch (err) {
+              console.log("repinga")
+              throw new Error(err);
+          }
+        },
         followClub: async (_, { username }, context) => {
           // Ensure user is authenticated
           const user = await User.findOne({ username: checkAuth(context).username });
