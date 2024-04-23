@@ -39,7 +39,7 @@ module.exports = {
                                                           {"$unwind": {"path": "$assignments"}},
                                                           {"$match": {"assignments.dueDate": target_dueDate, "username": target_username}},
                                                           {"$project":
-                                                            {"title": "$assignments.title", "description": "$assignments.description",
+                                                            {"id": "$assignments._id", "title": "$assignments.title", "description": "$assignments.description",
                                                              "dueDate": "$assignments.dueDate", "category": "$assignments.category"}}
                                                          ])
 
