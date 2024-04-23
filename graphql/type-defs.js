@@ -26,15 +26,15 @@ const typeDefs = gql`
         date: String!
     }
 
-        # (1) make the Club a separate entity or (2) make it a user with extra privileges?
-        type Club{
-            id: ID!
-            username: String!
-            email: String!
-            password: String!
-            token: String!
-            events: [Event]
-        }
+    # (1) make the Club a separate entity or (2) make it a user with extra privileges?
+    type Club{
+        id: ID!
+        username: String!
+        email: String!
+        password: String!
+        token: String!
+        events: [Event]
+    }
 
     input RegisterInput {
         username: String!
