@@ -175,6 +175,10 @@ module.exports = {
             }
           }
 
+          console.log(dueDate)
+          dueDate = dueDate.replaceAll("-","/")
+          console.log(dueDate)
+
           if (user) {   //user found
             user.assignments.unshift({
               title,
