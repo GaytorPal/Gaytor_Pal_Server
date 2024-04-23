@@ -10,6 +10,7 @@ userSchema = new Schema({
             title: String,
             description: String,
             dueDate: String,
+            dueDateReduced: String,
             category: String
         }
     ],

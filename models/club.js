@@ -5,6 +5,8 @@ clubSchema = new Schema({
     password: String,
     email: String,
     createdAt: String,
+    club_name: String,
+    category: String,
     events: [
         {
             title: String,

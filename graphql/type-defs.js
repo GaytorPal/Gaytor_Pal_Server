@@ -16,6 +16,7 @@ const typeDefs = gql`
         title: String!
         description: String!
         dueDate: String!
+        dueDateReduced: String!
         category: String!
     }
 

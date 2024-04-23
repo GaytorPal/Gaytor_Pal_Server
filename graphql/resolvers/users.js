@@ -37,7 +37,7 @@ module.exports = {
             const due_assignments = await User.aggregate(
                                                          [
                                                           {"$unwind": {"path": "$assignments"}},
-                                                          {"$match": {"assignments.dueDate": target_dueDate, "username": target_username}},
+                                                          {"$match": {"assignments.dueDateReduced": target_dueDate, "username": target_username}},
                                                           {"$project":
                                                             {"id": "$assignments._id", "title": "$assignments.title", "description": "$assignments.description",
                                                              "dueDate": "$assignments.dueDate", "category": "$assignments.category"}}
@@ -121,8 +121,6 @@ module.exports = {
           
           if (!user) {throw new UserInputError('User not found')}
 
-          console.log(user.username)
-
           //input validation
           if (title.trim() === '') {
             throw new UserInputError ('Empty Assignment Title', {
@@ -134,7 +132,7 @@ module.exports = {
 
           const due_month = Number(dueDate.substring(0, 2))
           const due_day = Number(dueDate.substring(3, 5))
-          const due_year = Number(dueDate.substring(6, 8))
+          const due_year = Number(dueDate.substring(6, 10))
 
           if (due_month > 12) {
             throw new UserInputError ('Invalid Month in Due Date', {
@@ -179,11 +177,15 @@ module.exports = {
           dueDate = dueDate.replaceAll(/-|_/gi,"/")
           console.log(dueDate)
 
+          const dueDateReduced = dueDate.substring(0, 10)
+          console.log(":" + dueDateReduced)
+
           if (user) {   //user found
             user.assignments.unshift({
               title,
               description,
               dueDate,
+              dueDateReduced,
               category
             });
             await user.save();
