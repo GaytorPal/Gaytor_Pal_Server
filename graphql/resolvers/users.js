@@ -176,7 +176,7 @@ module.exports = {
           }
 
           console.log(dueDate)
-          dueDate = dueDate.replaceAll("-","/")
+          dueDate = dueDate.replaceAll(/-|_/gi,"/")
           console.log(dueDate)
 
           if (user) {   //user found
