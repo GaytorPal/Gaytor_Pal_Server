@@ -11,7 +11,8 @@ userSchema = new Schema({
             description: String,
             dueDate: String,
             dueDateReduced: String,
-            category: String
+            category: String,
+            completed: Boolean
         }
     ],
   });

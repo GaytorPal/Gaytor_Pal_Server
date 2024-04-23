@@ -18,6 +18,7 @@ const typeDefs = gql`
         dueDate: String!
         dueDateReduced: String!
         category: String!
+        completed: Boolean!
     }
 
     type Event {
@@ -25,6 +26,7 @@ const typeDefs = gql`
         title: String!
         description: String!
         date: String!
+        dateReduced: String!
     }
 
     # (1) make the Club a separate entity or (2) make it a user with extra privileges?
@@ -55,11 +57,12 @@ const typeDefs = gql`
     type Mutation{
         registerUser(registerInput: RegisterInput): User!
         loginUser(username: String!, password: String!): User!
-        addAssignment(username: String!, title: String!, description: String!, dueDate: String!, category: String!): User!   #dueDate formatted as xx/xx/xxxx
-        
+        addAssignment(username: String!, title: String!, description: String!, dueDate: String!, category: String!): User!   #dueDate formatted as mm/dd/yyyy hh:mm
+        toggleCompleted(target_id: ID!, user_id: ID!): User!
+
         registerClub(registerInput: RegisterInput): Club!
         loginClub(username: String!, password: String!): Club!
-        addEvent(title: String!, description: String!, dueDate: String!, category: String!): Club!
+        addEvent(username: String!, title: String!, description: String!, dueDate: String!, category: String!): Club!
     }
 `;
 

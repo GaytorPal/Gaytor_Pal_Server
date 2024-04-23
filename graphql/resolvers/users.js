@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { UserInputError } = require('apollo-server');
 const checkAuth = require('../../util/check-auth');
+const mongoose = require('mongoose');
+const {ObjectId} = require('mongodb')
 
 const { SECRET_KEY } = require('../../config');
 
@@ -40,7 +42,8 @@ module.exports = {
                                                           {"$match": {"assignments.dueDateReduced": target_dueDate, "username": target_username}},
                                                           {"$project":
                                                             {"id": "$assignments._id", "title": "$assignments.title", "description": "$assignments.description",
-                                                             "dueDate": "$assignments.dueDate", "dueDateReduced": "$assignments.dueDateReduced", "category": "$assignments.category"}}
+                                                             "dueDate": "$assignments.dueDate", "dueDateReduced": "$assignments.dueDateReduced",
+                                                              "category": "$assignments.category", "completed": "$assignments.completed"}}
                                                          ])
 
             console.log(due_assignments)
@@ -180,17 +183,90 @@ module.exports = {
           const dueDateReduced = dueDate.substring(0, 10)
           console.log(":" + dueDateReduced)
 
+          const completed = false
+
           if (user) {   //user found
             user.assignments.unshift({
               title,
               description,
               dueDate,
               dueDateReduced,
-              category
+              category,
+              completed
             });
             await user.save();
             return user;
           } else throw new UserInputError('User not found')
-        } //TODO: Add checking for correct input format xx/xx/xxxx
+        },
+
+        async toggleCompleted(_, {target_id, user_id}) {
+          try {
+
+            //let the_id = ObjectId(target_id)
+
+            // console.log(target_id)
+
+            // const user = await User.findById(target_id).aggregate(
+            //                                                 [
+            //                                                 {"$unwind": {"path": "$assignments"}},
+                                                          
+                                                            
+            //                                                 ]
+
+            // )
+            // console.log(user)
+
+            // const the_assignment = User.find({
+            //   "assignments": {
+            //     "$elemMatch": {
+            //       "_id": mongoose.Types.ObjectId(the_id),
+            //       "default": true
+            //     }
+            //   }
+            // }, {
+            //   "accounts.$._id": 1 // "accounts.$": 1 also works
+            // }).pretty()
+
+          //   idConversionStage = {
+          //     $addFields: {
+          //        convertedId: { $toObjectId: "$_id" }
+          //     }
+          //  };
+            
+          //   const the_assignment = await User.aggregate(
+          //                                                 [
+          //                                                 {"$unwind": {"path": "$assignments"}},
+          //                                                 idConversionStage,
+          //                                                 {"$match": {"assignments.convertedId": target_id}},
+          //                                                 {"$project":
+          //                                                   {"id": "$assignments.id"}}
+          //                                                 ])
+
+          const user = await User.findById(user_id);
+
+          if (user) {
+            const assignment_index = user.assignments.findIndex((c) => c.id === target_id);
+
+            if (assignment_index == -1) {throw new UserInputError("Assignment not found")}
+
+            console.log(assignment_index)
+    
+            if (user.assignments[assignment_index].completed) 
+            {
+              user.assignments[assignment_index].completed = false
+            } else {
+              user.assignments[assignment_index].completed = true
+            }
+              await user.save();
+              return user;
+          } else {
+            throw new UserInputError('User not found');
+          }
+        }
+          catch (err) {
+             console.log("repinga")
+             throw new Error(err);
+          }
+        }
      }
 };
