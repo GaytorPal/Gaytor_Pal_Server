@@ -31,26 +31,26 @@ module.exports = {
           }
         },
         async getAssignmentsByDue(_, {target_username, target_dueDate}) {
-          // const user = await User.findOne({username})
-
-          console.log(target_username)
-          console.log(target_dueDate)
 
           try {
-            // const due_assignments = await User.find({ "assignments.dueDate": target_dueDate, username: target_username });
+            
             const due_assignments = await User.aggregate(
                                                          [
                                                           {"$unwind": {"path": "$assignments"}},
                                                           {"$match": {"assignments.dueDate": target_dueDate, "username": target_username}},
                                                           {"$project":
-                                                            {"title": "$assignments.title", "dueDate": "$assignments.dueDate"}}
+                                                            {"title": "$assignments.title", "description": "$assignments.description",
+                                                             "dueDate": "$assignments.dueDate", "category": "$assignments.category"}}
                                                          ])
 
             console.log(due_assignments)
 
+            // console.log(due_assignments[4].dueDate)
+
             return due_assignments;
           } catch (err) {
-            throw new Error(err);
+             console.log("repinga")
+             throw new Error(err);
           }
         }
     },
@@ -112,9 +112,14 @@ module.exports = {
                 token
               };
         },
-        async addAssignment(_, {title, description, dueDate, category}, context) {
+        async addAssignment(_, {username, title, description, dueDate, category}) {
 
-          var user = await User.findOne({username: checkAuth(context).username})
+          console.log(username)
+
+          // var user = await User.findOne({username: checkAuth(context).username})
+          var user = await User.findOne({username})
+          
+          if (!user) {throw new UserInputError('User not found')}
 
           console.log(user.username)
 
@@ -129,7 +134,7 @@ module.exports = {
 
           const due_month = Number(dueDate.substring(0, 2))
           const due_day = Number(dueDate.substring(3, 5))
-          const due_year = Number(dueDate.substring(6, 10))
+          const due_year = Number(dueDate.substring(6, 8))
 
           if (due_month > 12) {
             throw new UserInputError ('Invalid Month in Due Date', {

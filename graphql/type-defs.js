@@ -29,13 +29,13 @@ const typeDefs = gql`
 
     type Query{
         getUsers: [User!]!
-        getAssignmentsByDue(target_username: String!, target_dueDate: String!): [Assignment]!
+        getAssignmentsByDue(target_username: String!, target_dueDate: String!): [Assignment]
     }
 
     type Mutation{
         registerUser(registerInput: RegisterInput): User!
         loginUser(username: String!, password: String!): User!
-        addAssignment(title: String!, description: String! dueDate: String!, category: String!): User!   #dueDate formatted as xx/xx/xxxx
+        addAssignment(username: String!, title: String!, description: String!, dueDate: String!, category: String!): User!   #dueDate formatted as xx/xx/xxxx
     }
 `;
 
