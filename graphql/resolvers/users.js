@@ -296,6 +296,98 @@ module.exports = {
               console.log("repinga")
               throw new Error(err);
           }
+        },
+
+        async modifyAssignment(_, {target_id, user_id, title, description, dueDate, category, completed}) {
+          try {
+            
+            const user = await User.findById(user_id);
+            console.log(user)
+
+            if (!user) {throw new UserInputError("User not found")}
+
+            const assignment_index = user.assignments.findIndex((c) => c.id === target_id);
+
+            if (assignment_index == -1) {throw new UserInputError("Assignment not found")}
+
+            console.log(assignment_index)
+      
+            //input validation
+            if (title.trim() === '') {
+              throw new UserInputError ('Empty Assignment Title', {
+                errors: {
+                  body: 'Assignment Title must not be empty'
+                }
+              });
+            }
+
+            const due_month = Number(dueDate.substring(0, 2))
+            const due_day = Number(dueDate.substring(3, 5))
+            const due_year = Number(dueDate.substring(6, 10))
+
+            if (due_month > 12) {
+              throw new UserInputError ('Invalid Month in Due Date', {
+                errors: {
+                  body: 'Month must not exceed 12'
+                }
+              });
+            }
+            if ((due_month == 1 || due_month == 3 || due_month == 5 || due_month == 7 || due_month == 8 || due_month == 10 || due_month == 12)
+                && due_day > 31) {
+              throw new UserInputError ('Invalid Day in Due Date', {
+                errors: {
+                  body: 'Day in specified month must not exceed 31'
+                }
+              });
+            }
+            else if ((due_month == 4 || due_month == 6 || due_month == 9 || due_month == 11) && due_day > 30) {
+              throw new UserInputError ('Invalid Day in Due Date', {
+                errors: {
+                  body: 'Day in specified month must not exceed 30'
+                }
+              });
+            }
+            else if (due_month == 2) {  
+              if (!(due_year % 4 === 0) && due_day > 28) {                //leap year :)
+                throw new UserInputError ('Invalid Day in Due Date', {
+                  errors: {
+                    body: 'Day in specified month must not exceed 28'
+                  }
+                });
+              }
+              else if (due_day > 29) {
+                throw new UserInputError ('Invalid Day in Due Date', {
+                  errors: {
+                    body: 'Day in specified month must not exceed 29'
+                  }
+                });
+              }
+            }
+
+            console.log(dueDate)
+            dueDate = dueDate.replaceAll(/-|_/gi,"/")
+            console.log(dueDate)
+
+            const dueDateReduced = dueDate.substring(0, 10)
+            console.log(":" + dueDateReduced)
+
+            user.assignments[assignment_index] = {
+              id: target_id,
+              title,
+              description,
+              dueDate,
+              dueDateReduced,
+              category,
+              completed
+            };
+
+            await user.save();
+            return user;
+          }
+            catch (err) {
+              console.log("repinga")
+              throw new Error(err);
+          }
         }
      }
 };

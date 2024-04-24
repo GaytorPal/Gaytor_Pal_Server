@@ -25,7 +25,7 @@ const typeDefs = gql`
         id: ID!
         title: String!
         description: String!
-        date: String!
+        dueDate: String!
         dateReduced: String!
     }
 
@@ -59,6 +59,7 @@ const typeDefs = gql`
         loginUser(username: String!, password: String!): User!
         addAssignment(username: String!, title: String!, description: String!, dueDate: String!, category: String!): User!   #dueDate formatted as mm/dd/yyyy hh:mm
         deleteAssignment(target_id: ID!, user_id: ID!): String!
+        modifyAssignment(target_id: ID!, user_id: ID!, title: String, description: String, dueDate: String, category: String, completed: Boolean) : User!
         toggleCompleted(target_id: ID!, user_id: ID!): User!
 
         registerClub(registerInput: RegisterInput): Club!

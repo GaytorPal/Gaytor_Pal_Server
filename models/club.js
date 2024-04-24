@@ -11,7 +11,7 @@ clubSchema = new Schema({
         {
             title: String,
             description: String,
-            date: String,
+            dueDate: String,
             dateReduced: String
         }
     ],

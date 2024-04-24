@@ -112,9 +112,9 @@ module.exports = {
                 token
               };
         },
-        async addEvent(_, {title, description, dueDate, category}, context) {
+        async addEvent(_, {username, title, description, dueDate, category}) {
 
-          var club = await Club.findOne({username: checkAuth(context).username})
+          var club = await Club.findOne({ username });
 
           console.log(club.username)
 
