@@ -1,4 +1,5 @@
 const User = require('../../models/user');
+const Club = require('../../models/club');
 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -54,6 +55,20 @@ module.exports = {
           } catch (err) {
              console.log("repinga")
              throw new Error(err);
+          }
+        },
+        getClubsFollowedByUser: async (_, {}, context) => {
+          const user = await User.findOne({ username: checkAuth(context).username });
+          console.log(`AAAAAAAAAAAAAAAAAAAAAAA${user.username}`)
+          if (!user) {
+              throw new Error('User not authenticated');
+          }
+          try {
+              // Query the 'Club' collection to fetch followed clubs based on the 'followingClubs' array
+              const followedClubs = await Club.find({ _id: { $in: user.followingClubs } });
+              return followedClubs;
+          } catch (error) {
+              throw new Error('Error fetching clubs followed by user');
           }
         }
     },
@@ -198,7 +213,7 @@ module.exports = {
             return user;
           } else throw new UserInputError('User not found')
         },
-
+        
         async toggleCompleted(_, {target_id, user_id}) {
           try {
 
@@ -295,6 +310,80 @@ module.exports = {
             catch (err) {
               console.log("repinga")
               throw new Error(err);
+          }
+        },
+        followClub: async (_, { username }, context) => {
+          // Ensure user is authenticated
+          const user = await User.findOne({ username: checkAuth(context).username });
+          if (!user) {
+              throw new Error('User not authenticated');
+          }
+      
+          try {
+              // Find the club to follow by their username
+              const clubToFollow = await Club.findOne({ username });
+      
+              // Ensure the club exists
+              if (!clubToFollow) {
+                  throw new Error('Club not found');
+              }
+      
+              // Add club to user's followingClubs array
+              await User.findOneAndUpdate(
+                  { _id: user._id }, // Filter
+                  { $addToSet: { followingClubs: clubToFollow._id } }, // Update
+                  { new: true } // Options to return the updated document
+              );
+      
+              // Add user to club's followers array
+              await Club.findOneAndUpdate(
+                  { _id: clubToFollow._id }, // Filter
+                  { $addToSet: { followers: user._id } }, // Update
+                  { new: true } // Options to return the updated document
+              );
+      
+              // Return updated user document
+              return user;
+          } catch (error) {
+              throw new Error('Error following club');
+          }
+      },
+        unfollowClub: async (_, { username }, context) => {
+          // Ensure user is authenticated
+          const user = await User.findOne({ username: checkAuth(context).username });
+          if (!user) {
+              throw new Error('User not authenticated');
+          }
+
+          try {
+            // Find the club to unfollow by their username
+            const clubToUnfollow = await Club.findOne({ username });
+    
+            // Ensure the club exists
+            if (!clubToUnfollow) {
+                throw new Error('Club not found');
+            }
+    
+            // Remove club from user's followingClubs array
+            await User.findOneAndUpdate(
+                { _id: user._id }, // Filter
+                { $pull: { followingClubs: clubToUnfollow._id } }, // Update
+                { new: true } // Options to return the updated document
+            );
+    
+            // Remove user from club's followers array
+            await Club.findOneAndUpdate(
+                { _id: clubToUnfollow._id }, // Filter
+                { $pull: { followers: user._id } }, // Update
+                { new: true } // Options to return the updated document
+            );
+    
+            console.log(`AAAAAA${user.username}`)
+            console.log(`AAAAAA${clubToUnfollow.username}`)
+            // Return updated user document
+            return user;
+          } catch (error) {
+            throw new Error('Error unfollowing club');
           }
         },
 

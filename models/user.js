@@ -15,6 +15,7 @@ userSchema = new Schema({
             completed: Boolean
         }
     ],
+    followingClubs: [{ type: Schema.Types.ObjectId, ref: 'Club' }]
   });
 
 module.exports = model('User', userSchema);
