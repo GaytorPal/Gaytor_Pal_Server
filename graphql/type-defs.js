@@ -52,10 +52,7 @@ const typeDefs = gql`
 
   type Query {
     getUsers: [User!]!
-    getAssignmentsByDue(
-      target_username: String!
-      target_dueDate: String!
-    ): [Assignment]!
+    getAssignmentsByDue(target_username: String!, target_dueDate: String!): [Assignment]!
 
     getClubs: [Club!]!
     getEventsByDue(target_username: String!, target_dueDate: String!): [Event]!

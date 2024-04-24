@@ -347,7 +347,7 @@ module.exports = {
           } catch (error) {
               throw new Error('Error following club');
           }
-      },
+        },
         unfollowClub: async (_, { username }, context) => {
           // Ensure user is authenticated
           const user = await User.findOne({ username: checkAuth(context).username });
@@ -386,7 +386,6 @@ module.exports = {
             throw new Error('Error unfollowing club');
           }
         },
-
         async modifyAssignment(_, {target_id, user_id, title, description, dueDate, category, completed}) {
           try {
             
@@ -402,7 +401,7 @@ module.exports = {
             console.log(assignment_index)
       
             //input validation
-            if (title.trim() === '') {
+            if (title && (title.trim() === '')) {
               throw new UserInputError ('Empty Assignment Title', {
                 errors: {
                   body: 'Assignment Title must not be empty'
@@ -410,65 +409,69 @@ module.exports = {
               });
             }
 
-            const due_month = Number(dueDate.substring(0, 2))
-            const due_day = Number(dueDate.substring(3, 5))
-            const due_year = Number(dueDate.substring(6, 10))
+            if (dueDate) {
+              const due_month = Number(dueDate.substring(0, 2))
+              const due_day = Number(dueDate.substring(3, 5))
+              const due_year = Number(dueDate.substring(6, 10))
+            
 
-            if (due_month > 12) {
-              throw new UserInputError ('Invalid Month in Due Date', {
-                errors: {
-                  body: 'Month must not exceed 12'
-                }
-              });
-            }
-            if ((due_month == 1 || due_month == 3 || due_month == 5 || due_month == 7 || due_month == 8 || due_month == 10 || due_month == 12)
-                && due_day > 31) {
-              throw new UserInputError ('Invalid Day in Due Date', {
-                errors: {
-                  body: 'Day in specified month must not exceed 31'
-                }
-              });
-            }
-            else if ((due_month == 4 || due_month == 6 || due_month == 9 || due_month == 11) && due_day > 30) {
-              throw new UserInputError ('Invalid Day in Due Date', {
-                errors: {
-                  body: 'Day in specified month must not exceed 30'
-                }
-              });
-            }
-            else if (due_month == 2) {  
-              if (!(due_year % 4 === 0) && due_day > 28) {                //leap year :)
-                throw new UserInputError ('Invalid Day in Due Date', {
+              if (due_month > 12) {
+                throw new UserInputError ('Invalid Month in Due Date', {
                   errors: {
-                    body: 'Day in specified month must not exceed 28'
+                    body: 'Month must not exceed 12'
                   }
                 });
               }
-              else if (due_day > 29) {
+              if ((due_month == 1 || due_month == 3 || due_month == 5 || due_month == 7 || due_month == 8 || due_month == 10 || due_month == 12)
+                  && due_day > 31) {
                 throw new UserInputError ('Invalid Day in Due Date', {
                   errors: {
-                    body: 'Day in specified month must not exceed 29'
+                    body: 'Day in specified month must not exceed 31'
                   }
                 });
               }
+              else if ((due_month == 4 || due_month == 6 || due_month == 9 || due_month == 11) && due_day > 30) {
+                throw new UserInputError ('Invalid Day in Due Date', {
+                  errors: {
+                    body: 'Day in specified month must not exceed 30'
+                  }
+                });
+              }
+              else if (due_month == 2) {  
+                if (!(due_year % 4 === 0) && due_day > 28) {                //leap year :)
+                  throw new UserInputError ('Invalid Day in Due Date', {
+                    errors: {
+                      body: 'Day in specified month must not exceed 28'
+                    }
+                  });
+                }
+                else if (due_day > 29) {
+                  throw new UserInputError ('Invalid Day in Due Date', {
+                    errors: {
+                      body: 'Day in specified month must not exceed 29'
+                    }
+                  });
+                }
+              }
+            } 
+            if (dueDate) {
+              console.log(dueDate)
+              dueDate = dueDate.replaceAll(/-|_/gi,"/")
+              console.log(dueDate)
             }
 
-            console.log(dueDate)
-            dueDate = dueDate.replaceAll(/-|_/gi,"/")
-            console.log(dueDate)
 
-            const dueDateReduced = dueDate.substring(0, 10)
+            let dueDateReduced = "null"
+
+            if (dueDate) {dueDateReduced = dueDate.substring(0, 10)}
             console.log(":" + dueDateReduced)
 
-            user.assignments[assignment_index] = {
-              id: target_id,
-              title,
-              description,
-              dueDate,
-              dueDateReduced,
-              category,
-              completed
-            };
+            user.assignments[assignment_index].title = (title) ? title : user.assignments[assignment_index].title;
+            user.assignments[assignment_index].description = (description) ? description : user.assignments[assignment_index].description;
+            user.assignments[assignment_index].dueDate = (dueDate) ? dueDate : user.assignments[assignment_index].dueDate;
+            user.assignments[assignment_index].dueDateReduced = (!(dueDateReduced === "null")) ? dueDateReduced : user.assignments[assignment_index].dueDateReduced;
+            user.assignments[assignment_index].category = (category) ? category : user.assignments[assignment_index].category;
+            user.assignments[assignment_index].completed = (completed) ? completed : user.assignments[assignment_index].completed;
 
             await user.save();
             return user;
